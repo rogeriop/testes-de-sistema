@@ -1,111 +1,69 @@
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class UsuarioLeilaoTest {
-	
+
 	private WebDriver driver;
-	
+	private UsuariosPage usuarios;
+
 	@Before
 	public void inicializa() {
-		driver = new FirefoxDriver();
+		this.driver = new FirefoxDriver();
+		this.usuarios = new UsuariosPage(driver);
 	}
-	
-	@Test
-	public void verificaFuncionamentoDoLinkNovoUsuario() {
-		
-		driver.get("http://localhost:8080/usuarios");
-		
-		WebElement linkNovoUsuario = driver.findElement(By.linkText("Novo Usuário"));
-		linkNovoUsuario.click();
 
-		WebElement nome = driver.findElement(By.name("usuario.nome"));
-		WebElement email = driver.findElement(By.name("usuario.email"));
-		
-		nome.sendKeys("Adriano Xavier");
-		email.sendKeys("axavier@empresa.com.br");
-		
-		WebElement botaoSalvar = driver.findElement(By.id("btnSalvar"));
-		botaoSalvar.click();
 
-		boolean achouNome = driver.getPageSource().contains("Adriano Xavier");
-		boolean achouEmail = driver.getPageSource().contains("axavier@empresa.com.br");
-		
-		assertTrue(achouNome);
-		assertTrue(achouEmail);
-
-	}
-	
 	@Test
 	public void deveAdicionarUmUsuario() {
-		
-		driver.get("http://localhost:8080/usuarios/new");
-		
-		WebElement nome = driver.findElement(By.name("usuario.nome"));
-		WebElement email = driver.findElement(By.name("usuario.email"));
-		
-		nome.sendKeys("Adriano Xavier");
-		email.sendKeys("axavier@empresa.com.br");
-		
-		WebElement botaoSalvar = driver.findElement(By.id("btnSalvar"));
-		botaoSalvar.click();
-		
-		boolean achouNome = driver.getPageSource().contains("Adriano Xavier");
-		boolean achouEmail = driver.getPageSource().contains("axavier@empresa.com.br");
-		
-		assertTrue(achouNome);
-		assertTrue(achouEmail);
-		
+
+		usuarios.visita();
+		usuarios.novo().cadastra("Adriano Xavier", "axavier@empresa.com.br");
+
+		assertTrue(usuarios.existeNaListagem("Adriano Xavier",
+				"axavier@empresa.com.br"));
+
 	}
 
 	@Test
 	public void deveRejeitarUmUsuarioComNomeNaoPreenchido() {
-		
-		driver.get("http://localhost:8080/usuarios/new");
-		
-		WebElement nome = driver.findElement(By.name("usuario.nome"));
-		WebElement email = driver.findElement(By.name("usuario.email"));
-		
-		nome.sendKeys("");
-		email.sendKeys("axavier@empresa.com.br");
-		
-		WebElement botaoSalvar = driver.findElement(By.id("btnSalvar"));
-		botaoSalvar.click();
-		
-		boolean naoAchouNome = driver.getPageSource().contains("Nome obrigatorio!");
-		
-		assertTrue(naoAchouNome);
+
+		usuarios.visita();
+		usuarios.novo().cadastra("", "axavier@empresa.com.br");
+
+		assertTrue(usuarios.achouCritica("Nome obrigatorio!"));
 
 	}
 
 	@Test
 	public void deveRejeitarUmUsuarioComNomeNaoPreenchidoEEmailNaoPreenchido() {
+
+		usuarios.visita();
+		usuarios.novo().cadastra("", "");
+
+		assertTrue(usuarios.achouCritica("Nome obrigatorio!"));
+		assertTrue(usuarios.achouCritica("E-mail obrigatorio!"));
+
+	}
+	
+	@Test
+	public void deveExcluirOUsuarioAdicionadoNesteTeste() {
 		
-		driver.get("http://localhost:8080/usuarios/new");
+		usuarios.visita();
+		usuarios.excluiUsuarioCadastradoNesteTeste();
+
+		assertFalse(usuarios.existeNaListagem("Adriano Xavier",
+				"axavier@empresa.com.br"));
 		
-		WebElement nome = driver.findElement(By.name("usuario.nome"));
-		WebElement email = driver.findElement(By.name("usuario.email"));
-		
-		nome.sendKeys("");
-		email.sendKeys("");
-		
-		WebElement botaoSalvar = driver.findElement(By.id("btnSalvar"));
-		botaoSalvar.click();
-		
-		boolean naoAchouNome = driver.getPageSource().contains("Nome obrigatorio!");
-		boolean naoAchouEmail = driver.getPageSource().contains("E-mail obrigatorio!");
-		
-		assertTrue(naoAchouNome);
-		assertTrue(naoAchouEmail);
 		
 	}
 	
+
 	@After
 	public void finaliza() {
 		driver.close();
