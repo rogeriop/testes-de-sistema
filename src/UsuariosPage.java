@@ -30,13 +30,21 @@ public class UsuariosPage {
 	}
 
 	public void excluiUsuarioCadastradoNesteTeste() {
-		
+
 		int posicao = 1; // queremos o 1o botao da pagina
 		driver.findElements(By.tagName("button")).get(posicao - 1).click();
-		
+
 		// pega o alert que está aberto
 		Alert alert = driver.switchTo().alert();
 		// confirma
 		alert.accept();
 	}
+
+	public AlteraUsuarioPage altera() {
+
+		int posicao = 1; // 1o link de editar que aparecer
+		driver.findElements(By.linkText("editar")).get(posicao - 1).click();
+		return new AlteraUsuarioPage(driver);
+	}
+
 }
