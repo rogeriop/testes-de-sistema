@@ -15,7 +15,8 @@ public class DetalhesDoLeilaoPage {
 	
 	public void lance(String usuario, double valor) {
 		WebElement txtValor = driver.findElement(By.name("lance.valor"));
-		Select cbUsuario = new Select(driver.findElement(By.name("lance.usuario.id")));
+		WebElement combo = driver.findElement(By.name("lance.usuario.id"));
+		Select cbUsuario = new Select(combo);
 		
 		cbUsuario.selectByVisibleText(usuario);
 		txtValor.sendKeys(String.valueOf(valor));
